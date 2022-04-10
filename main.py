@@ -9,7 +9,7 @@ import requests
 from flask import Flask, request
 
 
-bot = telebot.TeleBot(os.environ.get(TOKEN))
+bot = telebot.TeleBot(os.environ.get("TOKEN"))
 server = Flask(__name__)
 
 
