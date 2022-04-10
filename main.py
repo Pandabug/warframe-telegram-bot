@@ -251,7 +251,7 @@ def user_message(message):
     bot.send_message(message.chat.id, ('Команды не найдено.' if user_data['language'] == 'ru' else 'No command available.'))
 
 
-@server.route('/' + TOKEN, methods=['GET', 'POST'])
+@server.route('/' + os.environ.get("TOKEN"), methods=['GET', 'POST'])
 def getMessage():
     bot.process_new_updates([telebot.types.Update.de_json(request.get_data().decode("utf-8"))])
     return "!", 200
@@ -260,7 +260,7 @@ def getMessage():
 @server.route("/")
 def webhook():
     bot.remove_webhook()
-    bot.set_webhook(url=f'https://warframe-telegram-bot.herokuapp.com/{TOKEN}')
+    bot.set_webhook(url=f'https://warframe-telegram-bot.herokuapp.com/{os.environ.get("TOKEN")}')
     return "!", 200
 
 
