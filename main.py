@@ -1,5 +1,4 @@
 import texts as text
-from Constants import TOKEN
 from db import users_collection
 
 import telebot
