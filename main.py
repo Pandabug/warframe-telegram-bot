@@ -13,18 +13,18 @@ bot = telebot.TeleBot(os.environ.get("TOKEN"))
 server = Flask(__name__)
 
 
+en_help_names = ['/time', '/search', '/sortie', '/trader', '/arbitration', '/nightwave', '/events']
+
+ru_mission_names = ['Улей', 'Шпионаж', 'Спасение', 'Оборона', 'Выживание', 'Стычка', 'Летучий', 'Разрушение', 'Разкопки', 'Перехват', 'Мобильная Оборона', 'Саботаж']
+en_mission_names =['Hive', 'Spy', 'Rescue', 'Defense', 'Survival', 'Skirmish', 'Volatile', 'Disruption', 'Excavation', 'Interception', 'Mobile Defense', 'Sabotage']
+
+
 # Calculate length
 def calc_len(keyword, num_char):
     tabs_to_append = num_char - len(keyword)
     new_keyword = (keyword[:num_char-1] + "." if (tabs_to_append <= 0) else keyword[:num_char] + " "*tabs_to_append)
 
     return new_keyword
-
-
-en_help_names = ['/time', '/search', '/sortie', '/trader', '/arbitration', '/nightwave', '/events']
-
-ru_mission_names = ['Улей', 'Шпионаж', 'Спасение', 'Оборона', 'Выживание', 'Стычка', 'Летучий', 'Разрушение', 'Разкопки', 'Перехват', 'Мобильная Оборона', 'Саботаж']
-en_mission_names =['Hive', 'Spy', 'Rescue', 'Defense', 'Survival', 'Skirmish', 'Volatile', 'Disruption', 'Excavation', 'Interception', 'Mobile Defense', 'Sabotage']
 
 
 # Start
@@ -96,16 +96,14 @@ def support(message):
 @bot.message_handler(commands=['time'])
 def wordl_time(message):
     user_data = users_collection.find_one({'_id': message.from_user.id})
+    space = '--------------------|------------'
 
     try:
         response = requests.get('https://ws.warframestat.us/pc/').json()
 
-        if user_data['language'] == 'ru':
-            msg = f'Ровнины Ейдолона: {response["cetusCycle"]["shortString"]}\n------------------------------\nВаллис: {response["vallisCycle"]["shortString"]}\n------------------------------\nКамбион: {response["cambionCycle"]["timeLeft"]}'
-        else:
-            msg = f'Plains of Eidolon: {response["cetusCycle"]["shortString"]}\n------------------------------\nOrb Vallis: {response["vallisCycle"]["shortString"]}\n------------------------------\nCambion Drift: {response["cambionCycle"]["timeLeft"]}'
+        msg = f'{calc_len(text.mission_text[user_data["language"]][5], 20)}|{response["cetusCycle"]["shortString"]}\n{space}\n{calc_len(text.mission_text[user_data["language"]][6], 20)}|{response["vallisCycle"]["shortString"]}\n{space}\n{calc_len(text.mission_text[user_data["language"]][7], 20)}|{response["cambionCycle"]["timeLeft"]}'
 
-        bot.send_message(message.chat.id, msg)
+        bot.send_message(message.chat.id, parse_mode='html', text=f'<pre>{msg}</pre>')
 
     except:
         bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
@@ -119,12 +117,8 @@ def sortie(message):
         response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/sortie').json()
         msg = ''
 
-        if user_data['language'] == 'ru':
-            for mission in response["variants"]:
-                msg += f'\n<b>{response["variants"].index(mission) + 1}</b> -----------------------------\n<b>Тип миссии:</b> {mission["missionType"]}\n<b>Планета:</b> {mission["node"]}'
-        else:
-            for mission in response['variants']:
-                msg += f'\n<b>{response["variants"].index(mission) + 1}</b> -----------------------------\n<b>Mission Type:</b> {mission["missionType"]}\n<b>Mission:</b> {mission["node"]}'
+        for mission in response["variants"]:
+            msg += f'\n-------------- <b>{response["variants"].index(mission) + 1}</b> --------------\n<b>{text.mission_text[user_data["language"]][3]}:</b> {mission["missionType"]}\n<b>{text.mission_text[user_data["language"]][0]}:</b> {mission["node"]}'
 
         bot.send_message(message.chat.id, parse_mode='html', text=f'{msg}')
 
@@ -169,12 +163,8 @@ def mission_search(message):
 
     try:
         checkMission = False
-        msg = ''
 
-        if user_data['language'] == 'ru':
-            msg = f'<b>{calc_len("Планета", 21)}|{calc_len("Реликвия", 8)}|{calc_len("Окончания", 11)}</b>\n---------------------|--------|----------\n'
-        else:
-            msg = f'<b>{calc_len("Planet", 21)}|{calc_len("Relic", 8)}|{calc_len("Time-left", 11)}</b>\n---------------------|--------|----------\n'
+        msg = f'<b>{calc_len(text.mission_text[user_data["language"]][0], 21)}|{calc_len(text.mission_text[user_data["language"]][1], 8)}|{calc_len(text.mission_text[user_data["language"]][2], 11)}</b>\n---------------------|--------|----------\n'
         
         response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/fissures').json()
         for mission in response:
@@ -199,10 +189,7 @@ def arbitration(message):
     try:
         response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/arbitration').json()
 
-        if user_data['language'] == 'ru':
-            bot.send_message(message.chat.id, f'Планета: {response["node"]}\nТип миссии: {response["type"]}\nВраги: {response["enemy"]}')
-        else:
-            bot.send_message(message.chat.id, f'Planet: {response["node"]}\nMission Type: {response["type"]}\nEnemys: {response["enemy"]}')
+        bot.send_message(message.chat.id, parse_mode='html', text=f'<pre>{calc_len(text.mission_text[user_data["language"]][0], 14)}|{response["node"]}\n{calc_len(text.mission_text[user_data["language"]][3], 14)}|{response["type"]}\n{calc_len(text.mission_text[user_data["language"]][4], 14)}|{response["enemy"]}</pre>')
 
     except:
         bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
@@ -234,7 +221,7 @@ def events(message):
         msg = ''
 
         for mission in response:
-            msg += f'<b>{response.index(mission) + 1}</b> ----------------\n{mission["description"]}\n{mission["node"]}\n'
+            msg += f'<b>-------------- {response.index(mission) + 1}</b> --------------\n{mission["description"]}\n{mission["node"]}\n'
 
         bot.send_message(message.chat.id, parse_mode='html', text=msg)
 
@@ -246,7 +233,7 @@ def events(message):
 @bot.message_handler(content_types=['text'])
 def user_message(message):
     user_data = users_collection.find_one({'_id': message.chat.id})
-    print(f'From: {message.from_user.first_name}, message: {message.text}')
+    print(f'From: {message.from_user.first_name}, message: \n{message.text}')
 
     bot.send_message(message.chat.id, ('Команды не найдено.' if user_data['language'] == 'ru' else 'No command available.'))
 
