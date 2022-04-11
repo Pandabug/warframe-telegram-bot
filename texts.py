@@ -17,3 +17,26 @@ error_text = {
     'ru': 'Что-то пошло не так. Пожалуйста, попытайтесь еще раз.', 
     'en': 'Something went wrong please try again.'
 }
+
+mission_text = {
+    'ru': {
+        0 : 'Планета', 
+        1 : 'Реликвия', 
+        2 : 'Окончания', 
+        3 : 'Тип миссии', 
+        4 : 'Враги', 
+        5 : 'Ровнины Ейдолона', 
+        6 : 'Валлис', 
+        7 : 'Камбион'
+    },
+    'en': {
+        0 : 'Planet', 
+        1 : 'Relic', 
+        2 : 'Time-left', 
+        3 : 'Mission Type', 
+        4 : 'Enemys', 
+        5 : 'Plains of Eidolon', 
+        6 : 'Orb Vallis', 
+        7 : 'Cambion Drift'
+    }
+}
