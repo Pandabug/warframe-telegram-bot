@@ -1,6 +1,6 @@
 start_text = {
-    'ru': '/help - список команд\n/info - информация o боте\n/language - установить язык\n/support - поддержать автора бота', 
-    'en': '/help - list of commands\n/info - bot information\n/language - to set a language\n/support - support bot author'
+    'ru': '/help - список команд\n/info - информация o боте\n/language - установить язык\n/creator - создатель бота', 
+    'en': '/help - list of commands\n/info - bot information\n/language - to set a language\n/creator - bot creator'
     }
     
 help_text = {
@@ -74,4 +74,5 @@ mission_names = {
     }
 }
 
+creator_text = ['support', 'github', 'telegram']
 en_help_names = ['/time', '/search', '/sortie', '/trader', '/arbitration', '/nightwave', '/events']
