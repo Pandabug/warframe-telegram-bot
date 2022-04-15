@@ -25,7 +25,7 @@ def calc_len(keyword, num_char):
 @bot.message_handler(commands=['start'])
 def start(message):
     if not users_collection.find_one({'_id': message.chat.id}):
-        users_collection.insert_one({'_id': message.chat.id, 'language': (message.from_user.language_code if message.from_user.language_code == 'ru' or message.from_user.language_code == 'en' else 'en'), 'notification': 'off'})
+        users_collection.insert_one({'_id': message.chat.id, 'language': (message.from_user.language_code if message.from_user.language_code == 'ru' or message.from_user.language_code == 'en' else 'en'), 'name': message.from_user.first_name})
 
     bot.send_message(message.chat.id, 'Hi Tenno!')
     bot.send_message(message.chat.id, text.start_text[message.from_user.language_code])
@@ -81,9 +81,28 @@ def callback_query(message):
             bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text='English language already installed!')
 
 
-@bot.message_handler(commands=['support'])
+@bot.message_handler(commands=['creator'])
 def support(message):
-    bot.send_message(chat_id=message.chat.id, parse_mode='html', text='Support creator: \n<pre>IBAN</pre>')
+    user_data = users_collection.find_one({'_id': message.from_user.id})
+
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    markup.add(
+        types.InlineKeyboardButton('Support', callback_data='support'), 
+        types.InlineKeyboardButton('GitHub', callback_data='github'), 
+        types.InlineKeyboardButton('Telegram', callback_data='telegram')
+    )
+
+    bot.send_message(message.chat.id, ('Выберете между:' if user_data['language'] == 'ru' else 'Select between:'), reply_markup=markup)
+
+
+@bot.callback_query_handler(func=lambda query: query.data in text.creator_text)
+def support(message):
+    if message.data == 'support':
+        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, parse_mode='html', text='Support creator: \n<pre>IBAN</pre>')
+    if message.data == 'github':
+        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, parse_mode='html', text='https://github.com/Pandabug')
+    if message.data == 'telegram':
+        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, parse_mode='html', text='https://t.me/import_panda')
 
 
 # Cetus current time
@@ -215,7 +234,7 @@ def events(message):
         msg = ''
 
         for mission in response:
-            msg += f'<b>-------------- {response.index(mission) + 1}</b> --------------\n{mission["description"]}\n{mission["node"]}\n'
+            msg += f'-------------- <b>{response.index(mission) + 1}</b> --------------\n{mission["description"]}\n{mission["node"]}\n'
 
         bot.send_message(message.chat.id, parse_mode='html', text=msg)
 
