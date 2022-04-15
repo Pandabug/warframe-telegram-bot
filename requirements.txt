@@ -1,3 +1,4 @@
 pyTelegramBotAPI==4.4.0
 pymongo==4.1.0
+pymongo[srv]
 Flask==2.1.1
