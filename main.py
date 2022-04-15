@@ -28,19 +28,15 @@ def start(message):
         users_collection.insert_one({'_id': message.chat.id, 'language': (message.from_user.language_code if message.from_user.language_code == 'ru' or message.from_user.language_code == 'en' else 'en'), 'name': message.from_user.first_name})
 
     bot.send_message(message.chat.id, 'Hi Tenno!')
-    bot.send_message(message.chat.id, text.start_text[message.from_user.language_code])
+    help(message)
 
 
-# Helo
+# Help
 @bot.message_handler(commands=['help'])
 def help(message):
     user_data = users_collection.find_one({'_id': message.chat.id})
 
-    markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
-    markup.add(*[types.KeyboardButton(text) for text in text.en_help_names])
-
     bot.send_message(message.chat.id, text.help_text[user_data['language']])
-    bot.send_message(message.chat.id, ('Выберете команду: ' if user_data['language'] == 'ru' else 'Select a command: '), reply_markup=markup)
 
 
 # Info
@@ -264,10 +260,21 @@ def webhook():
     return "!", 200
 
 
-def main():
-    bot.infinity_polling()
+bot.set_my_commands(
+    commands=[
+        telebot.types.BotCommand('time', 'current time on planets'),
+        telebot.types.BotCommand('search', 'search for void fissure missions type'),
+        telebot.types.BotCommand('sortie', 'sortie missions'),
+        telebot.types.BotCommand('trader', 'void trader information'),
+        telebot.types.BotCommand('arbitration', 'current arbitration mission'),
+        telebot.types.BotCommand('nightwave', 'nightwave missions'),
+        telebot.types.BotCommand('events', 'events'),
+        telebot.types.BotCommand('help', 'list of commands'),
+        telebot.types.BotCommand('language', 'set language'),
+    ]
+)
 
 
 if __name__ == '__main__':
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
-    main()
+    bot.infinity_polling()
