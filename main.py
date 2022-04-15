@@ -13,12 +13,6 @@ bot = telebot.TeleBot(os.environ.get("TOKEN"))
 server = Flask(__name__)
 
 
-en_help_names = ['/time', '/search', '/sortie', '/trader', '/arbitration', '/nightwave', '/events']
-
-ru_mission_names = ['Улей', 'Шпионаж', 'Спасение', 'Оборона', 'Выживание', 'Стычка', 'Летучий', 'Разрушение', 'Разкопки', 'Перехват', 'Мобильная Оборона', 'Саботаж']
-en_mission_names =['Hive', 'Spy', 'Rescue', 'Defense', 'Survival', 'Skirmish', 'Volatile', 'Disruption', 'Excavation', 'Interception', 'Mobile Defense', 'Sabotage']
-
-
 # Calculate length
 def calc_len(keyword, num_char):
     tabs_to_append = num_char - len(keyword)
@@ -43,7 +37,7 @@ def help(message):
     user_data = users_collection.find_one({'_id': message.chat.id})
 
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
-    markup.add(*[types.KeyboardButton(text) for text in en_help_names])
+    markup.add(*[types.KeyboardButton(text) for text in text.en_help_names])
 
     bot.send_message(message.chat.id, text.help_text[user_data['language']])
     bot.send_message(message.chat.id, ('Выберете команду: ' if user_data['language'] == 'ru' else 'Select a command: '), reply_markup=markup)
@@ -144,7 +138,7 @@ def void_trader(message):
 
 def keyboard(language):
     markup = types.InlineKeyboardMarkup(row_width=3)
-    markup.add(*[types.InlineKeyboardButton(text, callback_data=callback_query) for text, callback_query in zip((ru_mission_names if language == 'ru' else en_mission_names), en_mission_names)])
+    markup.add(*[types.InlineKeyboardButton(text.mission_names[language][count], callback_data=text.mission_names['en'][count]) for count in text.mission_names['en']])
 
     return markup
 
@@ -157,7 +151,7 @@ def search_for(message):
     bot.send_message(message.chat.id, 'Выберете между: ', reply_markup=keyboard(user_data['language']))
 
 
-@bot.callback_query_handler(func=lambda query: query.data in en_mission_names)
+@bot.callback_query_handler(func=lambda query: query.data in text.mission_names['en'].values())
 def mission_search(message):
     user_data = users_collection.find_one({'_id': message.from_user.id})
 
