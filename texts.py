@@ -40,3 +40,38 @@ mission_text = {
         7 : 'Cambion Drift'
     }
 }
+
+mission_names = {
+    'ru': {
+        0 : 'Захват',
+        1 : 'Оборона',
+        2 : 'Разрушение',
+        3 : 'Разкопки',
+        4 : 'Улей',
+        5 : 'Перехват',
+        6 : 'Мобильная Оборона',
+        7 : 'Спасение',
+        8 : 'Шпионаж',
+        9 : 'Выживание',
+        10 : 'Стычка',
+        11 : 'Саботаж',
+        12 : 'Арчвинг',
+    },
+    'en': {
+        0 : 'Capture',
+        1 : 'Defense',
+        2 : 'Disruption',
+        3 : 'Excavation',
+        4 : 'Hive',
+        5 : 'Interception',
+        6 : 'Mobile Defense',
+        7 : 'Rescue',
+        8 : 'Spy',
+        9 : 'Survival',
+        10 : 'Skirmish',
+        11 : 'Sabotage',
+        12 : 'Volatile',
+    }
+}
+
+en_help_names = ['/time', '/search', '/sortie', '/trader', '/arbitration', '/nightwave', '/events']
