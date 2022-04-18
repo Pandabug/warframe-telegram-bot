@@ -24,8 +24,8 @@ def calc_len(keyword, num_char):
 # Start
 @bot.message_handler(commands=['start'])
 def start(message):
-    if not users_collection.find_one({'_id': message.chat.id}):
-        users_collection.insert_one({'_id': message.chat.id, 'language': (message.from_user.language_code if message.from_user.language_code == 'ru' or message.from_user.language_code == 'en' else 'en'), 'name': message.from_user.first_name})
+    if not users_collection.find_one({'_id': message.from_user.id}):
+        users_collection.insert_one({'_id': message.from_user.id, 'language': (message.from_user.language_code if message.from_user.language_code == 'ru' or message.from_user.language_code == 'en' else 'en'), 'name': message.from_user.first_name})
 
     bot.send_message(message.chat.id, 'Hi Tenno!')
     help(message)
@@ -34,7 +34,7 @@ def start(message):
 # Help
 @bot.message_handler(commands=['help'])
 def help(message):
-    user_data = users_collection.find_one({'_id': message.chat.id})
+    user_data = users_collection.find_one({'_id': message.from_user.id})
 
     bot.send_message(message.chat.id, text.help_text[user_data['language']])
 
@@ -42,7 +42,7 @@ def help(message):
 # Info
 @bot.message_handler(commands=['info'])
 def info(message):
-    user_data = users_collection.find_one({'_id': message.chat.id})
+    user_data = users_collection.find_one({'_id': message.from_user.id})
 
     bot.send_message(message.chat.id, text.description_text[user_data['language']])
 
@@ -78,12 +78,11 @@ def callback_query(message):
 
 
 @bot.message_handler(commands=['creator'])
-def support(message):
+def creator(message):
     user_data = users_collection.find_one({'_id': message.from_user.id})
 
     markup = types.InlineKeyboardMarkup(row_width=2)
     markup.add(
-        types.InlineKeyboardButton('Support', callback_data='support'), 
         types.InlineKeyboardButton('GitHub', callback_data='github'), 
         types.InlineKeyboardButton('Telegram', callback_data='telegram')
     )
@@ -92,9 +91,7 @@ def support(message):
 
 
 @bot.callback_query_handler(func=lambda query: query.data in text.creator_text)
-def support(message):
-    if message.data == 'support':
-        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, parse_mode='html', text='Support creator: \n<pre>IBAN</pre>')
+def creator(message):
     if message.data == 'github':
         bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, parse_mode='html', text='https://github.com/Pandabug')
     if message.data == 'telegram':
@@ -151,9 +148,13 @@ def void_trader(message):
         bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
 
 
-def keyboard(language):
+def keyboard(type, language, check = False):
     markup = types.InlineKeyboardMarkup(row_width=3)
-    markup.add(*[types.InlineKeyboardButton(text.mission_names[language][count], callback_data=text.mission_names['en'][count]) for count in text.mission_names['en']])
+    markup.add(*[types.InlineKeyboardButton(type[language][count], callback_data=type['en'][count]) for count in type['en']])
+    if check:
+        markup.add(types.InlineKeyboardButton('-->', callback_data='-->'))
+    else:
+        markup.add(types.InlineKeyboardButton('<--', callback_data='<--'))
 
     return markup
 
@@ -161,12 +162,23 @@ def keyboard(language):
 # Search with message buttons
 @bot.message_handler(commands=['search'])
 def search_for(message):
-    user_data = users_collection.find_one({'_id': message.chat.id})
+    user_data = users_collection.find_one({'_id': message.from_user.id})
 
-    bot.send_message(message.chat.id, 'Выберете между: ', reply_markup=keyboard(user_data['language']))
+    bot.send_message(message.chat.id, f'{text.mission_text[user_data["language"]][8]}: ', reply_markup=keyboard(text.mission_names, user_data['language'], True))
 
 
-@bot.callback_query_handler(func=lambda query: query.data in text.mission_names['en'].values())
+@bot.callback_query_handler(func=lambda query: query.data in ['-->', '<--'])
+def change_keyboard(message):
+    user_data = users_collection.find_one({'_id': message.from_user.id})
+
+    if message.data == '-->':
+        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=f'{text.mission_text[user_data["language"]][8]}: ', reply_markup=keyboard(text.relic_names, user_data['language']))
+
+    if message.data == '<--':
+        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=f'{text.mission_text[user_data["language"]][8]}: ', reply_markup=keyboard(text.mission_names, user_data['language'], True))
+
+
+@bot.callback_query_handler(func=lambda query: query.data in text.mission_names['en'].values() or query.data in text.relic_names['en'].values())
 def mission_search(message):
     user_data = users_collection.find_one({'_id': message.from_user.id})
 
@@ -180,7 +192,9 @@ def mission_search(message):
             if mission['missionKey'] == message.data:
                 msg += f'{calc_len(mission["node"], 21)}|{calc_len(mission["tier"], 8)}|{calc_len(mission["eta"], 11)}\n'
                 checkMission = True
-        
+            elif mission['tier'] == message.data:
+                msg += f'{calc_len(mission["node"], 21)}|{calc_len(mission["tier"], 8)}|{calc_len(mission["eta"], 11)}\n'
+                checkMission = True
 
         if checkMission:
             bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, parse_mode='html', text=f'<b><u>{message.data}</u></b>\n<pre>{msg}</pre>')
@@ -193,7 +207,7 @@ def mission_search(message):
 
 @bot.message_handler(commands=['arbitration'])
 def arbitration(message):
-    user_data = users_collection.find_one({'_id': message.chat.id})
+    user_data = users_collection.find_one({'_id': message.from_user.id})
 
     try:
         response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/arbitration').json()
@@ -206,7 +220,7 @@ def arbitration(message):
 
 @bot.message_handler(commands=['nightwave'])
 def nightwave(message):
-    user_data = users_collection.find_one({'_id': message.chat.id})
+    user_data = users_collection.find_one({'_id': message.from_user.id})
 
     try:
         response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/nightwave').json()
@@ -223,10 +237,10 @@ def nightwave(message):
 
 @bot.message_handler(commands=['events'])
 def events(message):
-    user_data = users_collection.find_one({'_id': message.chat.id})
+    user_data = users_collection.find_one({'_id': message.from_user.id})
 
     try:
-        response = requests.get('https://ws.warframestat.us/pc/en/events').json()
+        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/events').json()
         msg = ''
 
         for mission in response:
@@ -238,10 +252,24 @@ def events(message):
         bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
 
 
+@bot.message_handler(commands=['spreward'])
+def steel_path_reward(message):
+    user_data = users_collection.find_one({'_id': message.from_user.id})
+
+    try:
+        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/steelPath').json()
+
+        bot.send_message(message.chat.id, parse_mode='html', text=f'Current reward: {response["currentReward"]["name"]}\nCost: {response["currentReward"]["cost"]}')
+
+    except:
+        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
+
+
+
 # Receive all message sent from user
 @bot.message_handler(content_types=['text'])
 def user_message(message):
-    user_data = users_collection.find_one({'_id': message.chat.id})
+    user_data = users_collection.find_one({'_id': message.from_user.id})
     print(f'From: {message.from_user.first_name}, message: \n{message.text}')
 
     bot.send_message(message.chat.id, ('Команды не найдено.' if user_data['language'] == 'ru' else 'No command available.'))
@@ -269,6 +297,7 @@ bot.set_my_commands(
         telebot.types.BotCommand('arbitration', 'current arbitration mission'),
         telebot.types.BotCommand('nightwave', 'nightwave missions'),
         telebot.types.BotCommand('events', 'events'),
+        telebot.types.BotCommand('spreward', 'weekly tenshin reward'),
         telebot.types.BotCommand('help', 'list of commands'),
         telebot.types.BotCommand('language', 'set language'),
     ]
