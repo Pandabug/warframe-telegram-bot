@@ -11,18 +11,20 @@ Born to help:
 
 ## Commands and Actions
 
-| Command        | Description                             |
-| -------------- | --------------------------------------- |
-| `/help`        | List of commands.                       |
-| `/language`    | Set a bot language.                     |
-| `/info`        | Bot info / description.                 |
-| `/time`        | Current world time in each earth.       |
-| `/search`      | Search for a void fissure mission type. |
-| `/sortie`      | Daily sortie.                           |
-| `/trader`      | Void Trader time left.                  |
-| `/arbitration` | Current arbitration mission.            |
-| `/nightwave`   | Weekly nightwave missions.              |
-| `/events`      | Warframe events.                        |
+| Command        | Description                                |
+| -------------- | ------------------------------------------ |
+| `/help`        | Show list of commands.                     |
+| `/language`    | Set favorite language.                     |
+| `/info`        | Show list of commands / description.       |
+| `/time`        | Get the current time on planets.           |
+| `/search`      | Search for void fissure missions.          |
+| `/sortie`      | Get the details on the current Sortie.     |
+| `/trader`      | Shows the Void Trader time and location.   |
+| `/arbitration` | Get current arbitration mission.           |
+| `/nightwave`   | Shows the daily and weekly nightwave acts. |
+| `/events`      | Show warframe events.                      |
+| `/tenshin`     | Show weekly tenshin reward.                |
+| `/news`        | The latest news from warframe.             |
 
 
 ## Enviroment
@@ -49,8 +51,13 @@ $ cd warframe-telegram-bot
 pip install -r requirements.txt
 ```
 
-* Past API Token in `Constants.py` file and save it with name `TOKEN = ''`.
+* Create file `Constants.py`
 
+Constants.py
+```
+TOKEN = 'TOKEN'
+MONGODB_URL = 'MONGODB_URL'
+```
 ### Run
 ```
 $ python main.py
