@@ -252,7 +252,7 @@ def events(message):
         bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
 
 
-@bot.message_handler(commands=['spreward'])
+@bot.message_handler(commands=['tenshin'])
 def steel_path_reward(message):
     user_data = users_collection.find_one({'_id': message.from_user.id})
 
@@ -264,6 +264,20 @@ def steel_path_reward(message):
     except:
         bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
 
+
+@bot.message_handler(commands=['news'])
+def news(message):
+    user_data = users_collection.find_one({'_id': message.from_user.id})
+
+    try:
+        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/news').json()
+        msg = ''
+
+        for news_data in response:
+            msg += f'{news_data["eta"]}\n<a href="{news_data["link"]}">{news_data["message"]}</a>\n------\n'
+        bot.send_message(message.chat.id, parse_mode='html', disable_web_page_preview=True, text=msg)
+    except:
+        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
 
 
 # Receive all message sent from user
@@ -290,16 +304,17 @@ def webhook():
 
 bot.set_my_commands(
     commands=[
-        telebot.types.BotCommand('time', 'current time on planets'),
-        telebot.types.BotCommand('search', 'search for void fissure missions type'),
-        telebot.types.BotCommand('sortie', 'sortie missions'),
-        telebot.types.BotCommand('trader', 'void trader information'),
-        telebot.types.BotCommand('arbitration', 'current arbitration mission'),
-        telebot.types.BotCommand('nightwave', 'nightwave missions'),
-        telebot.types.BotCommand('events', 'events'),
-        telebot.types.BotCommand('spreward', 'weekly tenshin reward'),
-        telebot.types.BotCommand('help', 'list of commands'),
-        telebot.types.BotCommand('language', 'set language'),
+        telebot.types.BotCommand('time', 'Get the current time on planets.'),
+        telebot.types.BotCommand('search', 'Search for void fissure missions.'),
+        telebot.types.BotCommand('sortie', 'Get the details on the current Sortie.'),
+        telebot.types.BotCommand('trader', 'Shows the Void Trader time and location.'),
+        telebot.types.BotCommand('arbitration', 'Get current arbitration mission.'),
+        telebot.types.BotCommand('nightwave', 'Shows the daily and weekly nightwave acts.'),
+        telebot.types.BotCommand('events', 'Show events.'),
+        telebot.types.BotCommand('tenshin', 'Show weekly tenshin reward.'),
+        telebot.types.BotCommand('news', 'The lastest news from warframe.'),
+        telebot.types.BotCommand('help', 'Show list of commands.'),
+        telebot.types.BotCommand('language', 'Set favorite language.'),
     ]
 )
 
