@@ -1,33 +1,35 @@
 help_text = {
     'ru': '''
 Здесь у вас есть список команд:
-/help - список команд
-/info - информация o боте
-/language - установить язык
-/creator - создатель бота
-/time — текущее время на планетах
-/search — поиск типа миссий разлома бездны
-/sortie — миссии вылазки
-/trader — информация о торговце бездны
-/arbitration — текущея миссиия арбитража
-/nightwave - миссии ночной волны
-/events - ивенты
-/spreward - еженедельная награда теншина
+/help - Показать список команд
+/info - Показать информацию о боте
+/language - Установить любимый язык
+/creator - Создатель бота
+/time — Получить текущее время на планетах
+/search — Поиск миссий разлома бездны
+/sortie — Получить подробную информацию о текущей вылазки
+/trader — Показывает время и местоположение торговцеа бездны
+/arbitration — Получить текущую миссию арбитража
+/nightwave - Показывает ежедневные и еженедельные ночные волны
+/events - Показать события
+/tenshin - Показать еженедельную награду теншина
+/news - Последние новости от варфейс
         ''', 
     'en': """
 Here you have a list of commands:
-/help - list of commands
-/info - bot information
-/language - to set a language
-/creator - bot creator
-/time - current time on planets
-/search - search for void fissure missions type
-/sortie - sortie missions
-/trader - void trader information
-/arbitration - current arbitration mission
-/nightwave - nightwave missions
-/events - events
-/spreward - weekly tenshin reward
+/help - Show list of commands
+/info - Show bot information
+/language - Set favorite language
+/creator - Bot creator
+/time - Get the current time on planets
+/search - Search for void fissure missions
+/sortie - Get the details on the current Sortie
+/trader - Shows the Void Trader time and location
+/arbitration - Get current arbitration mission
+/nightwave - Shows the daily and weekly nightwave acts
+/events - Show events
+/tenshin - Show weekly tenshin reward
+/news - The latest news from warframe
         """
 }
 
