@@ -47,7 +47,6 @@ def info(message):
     bot.send_message(message.chat.id, text.description_text[user_data['language']])
 
 
-# Change user language
 @bot.message_handler(commands=['language'])
 def language(message):
     user_data = users_collection.find_one({'_id': message.from_user.id})
