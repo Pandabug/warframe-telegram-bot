@@ -77,25 +77,9 @@ def callback_query(message):
             bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text='English language already installed!')
 
 
-@bot.message_handler(commands=['creator'])
+@bot.message_handler(commands=['repo'])
 def creator(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
-
-    markup = types.InlineKeyboardMarkup(row_width=2)
-    markup.add(
-        types.InlineKeyboardButton('GitHub', callback_data='github'), 
-        types.InlineKeyboardButton('Telegram', callback_data='telegram')
-    )
-
-    bot.send_message(message.chat.id, ('Выберете между:' if user_data['language'] == 'ru' else 'Select between:'), reply_markup=markup)
-
-
-@bot.callback_query_handler(func=lambda query: query.data in text.creator_text)
-def creator(message):
-    if message.data == 'github':
-        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, parse_mode='html', text='https://github.com/Pandabug')
-    if message.data == 'telegram':
-        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, parse_mode='html', text='https://t.me/import_panda')
+    bot.send_message(message.chat.id, 'https://github.com/Pandabug/warframe-telegram-bot')
 
 
 # Cetus current time
