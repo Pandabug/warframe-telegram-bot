@@ -4,7 +4,7 @@ help_text = {
 /help - Показать список команд
 /info - Показать информацию о боте
 /language - Установить любимый язык
-/creator - Создатель бота
+/repo - Исходный код бота
 /time — Получить текущее время на планетах
 /search — Поиск миссий разлома бездны
 /sortie — Получить подробную информацию о текущей вылазки
@@ -20,7 +20,7 @@ Here you have a list of commands:
 /help - Show list of commands
 /info - Show bot information
 /language - Set favorite language
-/creator - Bot creator
+/repo - Bot source code 
 /time - Get the current time on planets
 /search - Search for void fissure missions
 /sortie - Get the details on the current Sortie
@@ -118,5 +118,4 @@ relic_names = {
     }
 }
 
-creator_text = ['support', 'github', 'telegram']
 en_help_names = ['/time', '/search', '/sortie', '/trader', '/arbitration', '/nightwave', '/events', '/spreward']
