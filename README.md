@@ -14,7 +14,6 @@ Born to help:
 | Command        | Description                                |
 | -------------- | ------------------------------------------ |
 | `/help`        | Show list of commands.                     |
-| `/language`    | Set favorite language.                     |
 | `/info`        | Show list of commands / description.       |
 | `/time`        | Get the current time on planets.           |
 | `/search`      | Search for void fissure missions.          |
@@ -56,14 +55,13 @@ pip install -r requirements.txt
 Constants.py
 ```
 TOKEN = 'TOKEN'
-MONGODB_URL = 'MONGODB_URL'
 ```
 ### Run
 ```
 $ python main.py
 ```
 
-To stop use `CTRL+C`
+To stop use: `CTRL+C`
 
 
 ## Deployment
