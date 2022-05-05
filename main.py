@@ -1,5 +1,4 @@
 import texts as text
-from db import users_collection
 
 import telebot
 from telebot import types
@@ -24,57 +23,26 @@ def calc_len(keyword, num_char):
 # Start
 @bot.message_handler(commands=['start'])
 def start(message):
-    if not users_collection.find_one({'_id': message.from_user.id}):
-        users_collection.insert_one({'_id': message.from_user.id, 'language': (message.from_user.language_code if message.from_user.language_code == 'ru' or message.from_user.language_code == 'en' else 'en'), 'name': message.from_user.first_name})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
-    bot.send_message(message.chat.id, 'Hi Tenno!')
+    bot.send_message(message.chat.id, f'{text.mission_text[language][9]}')
     help(message)
 
 
 # Help
 @bot.message_handler(commands=['help'])
 def help(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
-    bot.send_message(message.chat.id, text.help_text[user_data['language']])
+    bot.send_message(message.chat.id, text.help_text[language])
 
 
 # Info
 @bot.message_handler(commands=['info'])
 def info(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
-    bot.send_message(message.chat.id, text.description_text[user_data['language']])
-
-
-@bot.message_handler(commands=['language'])
-def language(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
-
-    markup = types.InlineKeyboardMarkup(row_width=2)
-    markup.add(types.InlineKeyboardButton('En', callback_data='en'), types.InlineKeyboardButton('Ru', callback_data='ru'))
-
-    bot.send_message(message.chat.id, ('Выберете язык:' if user_data['language'] == 'ru' else 'Select language:'), reply_markup=markup)
-
-
-@bot.callback_query_handler(func=lambda query: query.data in ['ru', 'en'])
-def callback_query(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
-
-    if message.data == 'ru':
-        if user_data['language'] != 'ru':
-            users_collection.update_one({'_id': message.from_user.id}, {'$set': {'language': 'ru'}})
-            bot.answer_callback_query(callback_query_id=message.id, text="Установлен русский язык!")
-            bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text='Установлен русский язык!')
-        else:
-            bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text='У вас уже установлен русский язык!')
-    else:
-        if user_data['language'] != 'en':
-            users_collection.update_one({'_id': message.from_user.id}, {'$set': {'language': 'en'}})
-            bot.answer_callback_query(callback_query_id=message.id, text="English Language installed!")
-            bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text='English Language installed!')
-        else:
-            bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text='English language already installed!')
+    bot.send_message(message.chat.id, text.description_text[language])
 
 
 @bot.message_handler(commands=['repo'])
@@ -85,56 +53,57 @@ def creator(message):
 # Cetus current time
 @bot.message_handler(commands=['time'])
 def wordl_time(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
     space = '--------------------|------------'
 
     try:
         response = requests.get('https://ws.warframestat.us/pc/').json()
 
-        msg = f'{calc_len(text.mission_text[user_data["language"]][5], 20)}|{response["cetusCycle"]["shortString"]}\n{space}\n{calc_len(text.mission_text[user_data["language"]][6], 20)}|{response["vallisCycle"]["shortString"]}\n{space}\n{calc_len(text.mission_text[user_data["language"]][7], 20)}|{response["cambionCycle"]["timeLeft"]}'
+        msg = f'{calc_len(text.mission_text[language][5], 20)}|{response["cetusCycle"]["shortString"]}\n{space}\n{calc_len(text.mission_text[language][6], 20)}|{response["vallisCycle"]["shortString"]}\n{space}\n{calc_len(text.mission_text[language][7], 20)}|{response["cambionCycle"]["timeLeft"]}'
 
         bot.send_message(message.chat.id, parse_mode='html', text=f'<pre>{msg}</pre>')
 
     except:
-        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
+        bot.send_message(message.chat.id, f'{text.error_text[language]}')
 
 
 @bot.message_handler(commands=['sortie'])
 def sortie(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/sortie').json()
+        response = requests.get(f'https://ws.warframestat.us/pc/{language}/sortie').json()
         msg = ''
 
         for mission in response["variants"]:
-            msg += f'\n-------------- <b>{response["variants"].index(mission) + 1}</b> --------------\n<b>{text.mission_text[user_data["language"]][3]}:</b> {mission["missionType"]}\n<b>{text.mission_text[user_data["language"]][0]}:</b> {mission["node"]}'
+            msg += f'\n-------------- <b>{response["variants"].index(mission) + 1}</b> --------------\n<b>{text.mission_text[language][3]}:</b> {mission["missionType"]}\n<b>{text.mission_text[language][0]}:</b> {mission["node"]}'
 
         bot.send_message(message.chat.id, parse_mode='html', text=f'{msg}')
 
     except:
-        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
+        bot.send_message(message.chat.id, f'{text.error_text[language]}')
 
 
 @bot.message_handler(commands=['trader'])
 def void_trader(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/voidTrader').json()
+        response = requests.get(f'https://ws.warframestat.us/pc/{language}/voidTrader').json()
 
         if response['active']:
-            bot.send_message(message.chat.id, (f'Конец через: {response["endString"]}' if user_data['language'] == 'ru' else f'End in: {response["endString"]}'))
+            bot.send_message(message.chat.id, (f'Конец через: {response["endString"]}' if language == 'ru' else f'End in: {response["endString"]}'))
         else:
-            bot.send_message(message.chat.id, (f'Приедет через: {response["startString"]}' if user_data['language'] == 'ru' else f'Start in: {response["startString"]}'))
+            bot.send_message(message.chat.id, (f'Приедет через: {response["startString"]}' if language == 'ru' else f'Start in: {response["startString"]}'))
 
     except:
-        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
+        bot.send_message(message.chat.id, f'{text.error_text[language]}')
 
 
 def keyboard(type, language, check = False):
     markup = types.InlineKeyboardMarkup(row_width=3)
     markup.add(*[types.InlineKeyboardButton(type[language][count], callback_data=type['en'][count]) for count in type['en']])
+
     if check:
         markup.add(types.InlineKeyboardButton('-->', callback_data='-->'))
     else:
@@ -146,32 +115,32 @@ def keyboard(type, language, check = False):
 # Search with message buttons
 @bot.message_handler(commands=['search'])
 def search_for(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
-    bot.send_message(message.chat.id, f'{text.mission_text[user_data["language"]][8]}: ', reply_markup=keyboard(text.mission_names, user_data['language'], True))
+    bot.send_message(message.chat.id, f'{text.mission_text[language][8]}: ', reply_markup=keyboard(text.mission_names, language, True))
 
 
 @bot.callback_query_handler(func=lambda query: query.data in ['-->', '<--'])
 def change_keyboard(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.message.from_user.language_code if message.message.from_user.language_code in ['ru', 'en'] else 'en'
 
     if message.data == '-->':
-        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=f'{text.mission_text[user_data["language"]][8]}: ', reply_markup=keyboard(text.relic_names, user_data['language']))
+        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=f'{text.mission_text[language][8]}: ', reply_markup=keyboard(text.relic_names, language))
 
     if message.data == '<--':
-        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=f'{text.mission_text[user_data["language"]][8]}: ', reply_markup=keyboard(text.mission_names, user_data['language'], True))
+        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=f'{text.mission_text[language][8]}: ', reply_markup=keyboard(text.mission_names, language, True))
 
 
 @bot.callback_query_handler(func=lambda query: query.data in text.mission_names['en'].values() or query.data in text.relic_names['en'].values())
 def mission_search(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.message.from_user.language_code if message.message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
         checkMission = False
 
-        msg = f'<b>{calc_len(text.mission_text[user_data["language"]][0], 21)}|{calc_len(text.mission_text[user_data["language"]][1], 8)}|{calc_len(text.mission_text[user_data["language"]][2], 11)}</b>\n---------------------|--------|----------\n'
+        msg = f'<b>{calc_len(text.mission_text[language][0], 21)}|{calc_len(text.mission_text[language][1], 8)}|{calc_len(text.mission_text[language][2], 11)}</b>\n---------------------|--------|----------\n'
         
-        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/fissures').json()
+        response = requests.get(f'https://ws.warframestat.us/pc/{language}/fissures').json()
         for mission in response:
             if mission['missionKey'] == message.data:
                 msg += f'{calc_len(mission["node"], 21)}|{calc_len(mission["tier"], 8)}|{calc_len(mission["eta"], 11)}\n'
@@ -183,32 +152,32 @@ def mission_search(message):
         if checkMission:
             bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, parse_mode='html', text=f'<b><u>{message.data}</u></b>\n<pre>{msg}</pre>')
         else:
-            bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=('Миссии не найдено.' if user_data["language"] == 'ru' else 'No mission found.'))
+            bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=('Миссии не найдено.' if language == 'ru' else 'No mission found.'))
 
     except:
-        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=f'{text.error_text[user_data["language"]]}')
+        bot.edit_message_text(chat_id=message.message.chat.id, message_id=message.message.message_id, text=f'{text.error_text[language]}')
 
 
 @bot.message_handler(commands=['arbitration'])
 def arbitration(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/arbitration').json()
+        response = requests.get(f'https://ws.warframestat.us/pc/{language}/arbitration').json()
 
-        bot.send_message(message.chat.id, parse_mode='html', text=f'<pre>{calc_len(text.mission_text[user_data["language"]][0], 14)}|{response["node"]}\n{calc_len(text.mission_text[user_data["language"]][3], 14)}|{response["type"]}\n{calc_len(text.mission_text[user_data["language"]][4], 14)}|{response["enemy"]}</pre>')
+        bot.send_message(message.chat.id, parse_mode='html', text=f'<pre>{calc_len(text.mission_text[language][0], 14)}|{response["node"]}\n{calc_len(text.mission_text[language][3], 14)}|{response["type"]}\n{calc_len(text.mission_text[language][4], 14)}|{response["enemy"]}</pre>')
 
     except:
-        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
+        bot.send_message(message.chat.id, f'{text.error_text[language]}')
 
 
 @bot.message_handler(commands=['nightwave'])
 def nightwave(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/nightwave').json()
-        msg = (f'Сезон {response["season"]}' if user_data['language'] == 'ru' else f'Season {response["season"]}')
+        response = requests.get(f'https://ws.warframestat.us/pc/{language}/nightwave').json()
+        msg = (f'Сезон {response["season"]}' if language == 'ru' else f'Season {response["season"]}')
 
         for mission in response['activeChallenges']:
             msg += f'\n--------------------------\n{mission["desc"]}\n{mission["startString"]}'
@@ -216,15 +185,15 @@ def nightwave(message):
         bot.send_message(message.chat.id, parse_mode='html', text=f'{msg}')
 
     except:
-        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
+        bot.send_message(message.chat.id, f'{text.error_text[language]}')
 
 
 @bot.message_handler(commands=['events'])
 def events(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/events').json()
+        response = requests.get(f'https://ws.warframestat.us/pc/{language}/events').json()
         msg = ''
 
         for mission in response:
@@ -233,44 +202,44 @@ def events(message):
         bot.send_message(message.chat.id, parse_mode='html', text=msg)
 
     except:
-        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
+        bot.send_message(message.chat.id, f'{text.error_text[language]}')
 
 
 @bot.message_handler(commands=['tenshin'])
 def steel_path_reward(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/steelPath').json()
+        response = requests.get(f'https://ws.warframestat.us/pc/{language}/steelPath').json()
 
         bot.send_message(message.chat.id, parse_mode='html', text=f'Current reward: {response["currentReward"]["name"]}\nCost: {response["currentReward"]["cost"]}')
 
     except:
-        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
+        bot.send_message(message.chat.id, f'{text.error_text[language]}')
 
 
 @bot.message_handler(commands=['news'])
 def news(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{user_data["language"]}/news').json()
+        response = requests.get(f'https://ws.warframestat.us/pc/{language}/news').json()
         msg = ''
 
         for news_data in response:
             msg += f'{news_data["eta"]}\n<a href="{news_data["link"]}">{news_data["message"]}</a>\n------\n'
         bot.send_message(message.chat.id, parse_mode='html', disable_web_page_preview=True, text=msg)
     except:
-        bot.send_message(message.chat.id, f'{text.error_text[user_data["language"]]}')
+        bot.send_message(message.chat.id, f'{text.error_text[language]}')
 
 
 # Receive all message sent from user
 @bot.message_handler(content_types=['text'])
 def user_message(message):
-    user_data = users_collection.find_one({'_id': message.from_user.id})
+    language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
     print(f'From: {message.from_user.first_name}, message: \n{message.text}')
 
-    bot.send_message(message.chat.id, ('Команды не найдено.' if user_data['language'] == 'ru' else 'No command available.'))
+    bot.send_message(message.chat.id, ('Команды не найдено.' if language == 'ru' else 'No command available.'))
 
 
 @server.route('/' + os.environ.get("TOKEN"), methods=['GET', 'POST'])
@@ -298,7 +267,6 @@ bot.set_my_commands(
         telebot.types.BotCommand('tenshin', 'Show weekly tenshin reward.'),
         telebot.types.BotCommand('news', 'The lastest news from warframe.'),
         telebot.types.BotCommand('help', 'Show list of commands.'),
-        telebot.types.BotCommand('language', 'Set favorite language.'),
     ]
 )
 
