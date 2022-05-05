@@ -3,7 +3,6 @@ help_text = {
 Здесь у вас есть список команд:
 /help - Показать список команд
 /info - Показать информацию о боте
-/language - Установить любимый язык
 /repo - Исходный код бота
 /time — Получить текущее время на планетах
 /search — Поиск миссий разлома бездны
@@ -19,7 +18,6 @@ help_text = {
 Here you have a list of commands:
 /help - Show list of commands
 /info - Show bot information
-/language - Set favorite language
 /repo - Bot source code 
 /time - Get the current time on planets
 /search - Search for void fissure missions
@@ -54,6 +52,7 @@ mission_text = {
         6 : 'Валлис', 
         7 : 'Камбион',
         8 : 'Выберете между',
+        9 : 'Здраствуй Тенно!',
     },
     'en': {
         0 : 'Planet', 
@@ -65,6 +64,7 @@ mission_text = {
         6 : 'Orb Vallis', 
         7 : 'Cambion Drift',
         8 : 'Select between',
+        9 : 'Hi Tenno!',
     }
 }
 
