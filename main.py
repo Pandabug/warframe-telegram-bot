@@ -57,7 +57,7 @@ def wordl_time(message):
     space = '--------------------|------------'
 
     try:
-        response = requests.get('https://ws.warframestat.us/pc/').json()
+        response = requests.get('https://api.warframestat.us/pc/').json()
 
         msg = f'{calc_len(text.mission_text[language][5], 20)}|{response["cetusCycle"]["shortString"]}\n{space}\n{calc_len(text.mission_text[language][6], 20)}|{response["vallisCycle"]["shortString"]}\n{space}\n{calc_len(text.mission_text[language][7], 20)}|{response["cambionCycle"]["timeLeft"]}'
 
@@ -72,7 +72,7 @@ def sortie(message):
     language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{language}/sortie').json()
+        response = requests.get(f'https://api.warframestat.us/pc/{language}/sortie').json()
         msg = ''
 
         for mission in response["variants"]:
@@ -89,7 +89,7 @@ def void_trader(message):
     language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{language}/voidTrader').json()
+        response = requests.get(f'https://api.warframestat.us/pc/{language}/voidTrader').json()
 
         if response['active']:
             bot.send_message(message.chat.id, (f'Конец через: {response["endString"]}' if language == 'ru' else f'End in: {response["endString"]}'))
@@ -140,7 +140,7 @@ def mission_search(message):
 
         msg = f'<b>{calc_len(text.mission_text[language][0], 21)}|{calc_len(text.mission_text[language][1], 8)}|{calc_len(text.mission_text[language][2], 11)}</b>\n---------------------|--------|----------\n'
         
-        response = requests.get(f'https://ws.warframestat.us/pc/{language}/fissures').json()
+        response = requests.get(f'https://api.warframestat.us/pc/{language}/fissures').json()
         for mission in response:
             if mission['missionKey'] == message.data:
                 msg += f'{calc_len(mission["node"], 21)}|{calc_len(mission["tier"], 8)}|{calc_len(mission["eta"], 11)}\n'
@@ -163,7 +163,7 @@ def arbitration(message):
     language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{language}/arbitration').json()
+        response = requests.get(f'https://api.warframestat.us/pc/{language}/arbitration').json()
 
         bot.send_message(message.chat.id, parse_mode='html', text=f'<pre>{calc_len(text.mission_text[language][0], 14)}|{response["node"]}\n{calc_len(text.mission_text[language][3], 14)}|{response["type"]}\n{calc_len(text.mission_text[language][4], 14)}|{response["enemy"]}</pre>')
 
@@ -176,7 +176,7 @@ def nightwave(message):
     language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{language}/nightwave').json()
+        response = requests.get(f'https://api.warframestat.us/pc/{language}/nightwave').json()
         msg = (f'Сезон {response["season"]}' if language == 'ru' else f'Season {response["season"]}')
 
         for mission in response['activeChallenges']:
@@ -193,7 +193,7 @@ def events(message):
     language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{language}/events').json()
+        response = requests.get(f'https://api.warframestat.us/pc/{language}/events').json()
         msg = ''
 
         for mission in response:
@@ -210,7 +210,7 @@ def steel_path_reward(message):
     language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{language}/steelPath').json()
+        response = requests.get(f'https://api.warframestat.us/pc/{language}/steelPath').json()
 
         bot.send_message(message.chat.id, parse_mode='html', text=f'Current reward: {response["currentReward"]["name"]}\nCost: {response["currentReward"]["cost"]}')
 
@@ -223,7 +223,7 @@ def news(message):
     language = message.from_user.language_code if message.from_user.language_code in ['ru', 'en'] else 'en'
 
     try:
-        response = requests.get(f'https://ws.warframestat.us/pc/{language}/news').json()
+        response = requests.get(f'https://api.warframestat.us/pc/{language}/news').json()
         msg = ''
 
         for news_data in response:
