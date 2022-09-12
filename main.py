@@ -2,14 +2,12 @@ import texts as text
 
 import telebot
 from telebot import types
-# git push heroku main
+
 import os
 import requests
-from flask import Flask, request
 
 
 bot = telebot.TeleBot(os.environ.get("TOKEN"))
-server = Flask(__name__)
 
 
 # Calculate length
@@ -242,19 +240,6 @@ def user_message(message):
     bot.send_message(message.chat.id, ('Команды не найдено.' if language == 'ru' else 'No command available.'))
 
 
-@server.route('/' + os.environ.get("TOKEN"), methods=['GET', 'POST'])
-def getMessage():
-    bot.process_new_updates([telebot.types.Update.de_json(request.get_data().decode("utf-8"))])
-    return "!", 200
-
-
-@server.route("/")
-def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url=f'https://warframe-telegram-bot.herokuapp.com/{os.environ.get("TOKEN")}')
-    return "!", 200
-
-
 bot.set_my_commands(
     commands=[
         telebot.types.BotCommand('time', 'Get the current time on planets.'),
@@ -272,5 +257,4 @@ bot.set_my_commands(
 
 
 if __name__ == '__main__':
-    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
     bot.infinity_polling()
